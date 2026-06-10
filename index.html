@@ -1,126 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Captcha</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Comparison</title>
 
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial;
-            background: #7b5cff;
-            margin: 0;
-        }
+<style>
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.container{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.img-box{
+    width: 65%;
+    max-width: 900px;
+    position: relative;
+    overflow: hidden;
+    line-height: 0;
 
-        .box {
-            background: white;
-            width: 90%;
-            max-width: 300px;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.img-box img{
+    width: 100%;
+    display: block;
+    border-radius: 20px;
+}
+.img-wrap{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    overflow: hidden;
+}
+#line{
+    width: 3px;
+    height: 100%;
+    background: white;
+    position: absolute;
+    top: 0;
+    left: 50px;
+    cursor: ew-resize;
+}
 
-        .captcha {
-            border: 2px solid gray;
-            padding: 10px;
-            margin: 10px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 8px;
-        }
+.arrow{
+    width: 40px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+body{
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-        .text {
-            letter-spacing: 4px;
-            font-size: 20px;
-            font-weight: bold;
-        }
+    background: linear-gradient(-45deg, #1e3c72, #2a5298, #a73548, #dd2476);
+    background-size: 400% 400%;
+    animation: gradientMove 8s ease infinite;
+}
 
-        input {
-            padding: 10px;
-            width: 100%;
-            margin: 10px 0;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
+@keyframes gradientMove{
+    0%{ background-position: 0% 50%; }
+    50%{ background-position: 100% 50%; }
+    100%{ background-position: 0% 50%; }
+}
+</style>
 
-        button {
-            padding: 10px;
-            background: #7b5cff;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        button:hover {
-            background: #5a3edb;
-        }
-
-        .refresh {
-            width: auto;
-            padding: 6px 10px;
-            font-size: 14px;
-        }
-
-       
-        @media (max-width: 400px) {
-            .text {
-                font-size: 18px;
-            }
-        }
-    </style>
 </head>
+<body>
 
-<body onload="generate()">
+<div class="container">
+    <div class="img-box" id="imgBox">
+        <img src="carimg/car.png">
+        <div class="img-wrap" id="imgWrap">
+            <img src="carimg/orgcar.jpg" id="carImg">
+        </div>
+        <div id="line">
+            <img src="carimg/arrow.png" class="arrow">
+        </div>
 
-<div class="box">
-    <h3>Captcha</h3>
-
-    <div class="captcha">
-        <span class="text" id="abc"></span>
-        <button class="refresh" onclick="generate()">↻</button>
     </div>
-
-    <input type="text" placeholder="Enter captcha" id="res" onclick="this.value=''">
-
-    <button onclick="check()">Submit</button>
-    <p id="result"></p>
 </div>
 
 <script>
-let Captcha="";
+let imgBox = document.getElementById("imgBox");
+let imgWrap = document.getElementById("imgWrap");
+let line = document.getElementById("line");
+let carImg = document.getElementById("carImg");
 
-function generate()
-{
-    let ch="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    Captcha="";
-    for (let i=0;i<6;i++)
-    {
-        Captcha += ch[Math.floor(Math.random()*ch.length)];
-    }
+carImg.style.width = imgBox.offsetWidth + "px";
 
-    document.getElementById("abc").innerText=Captcha;
-}
+let leftSpace = imgBox.getBoundingClientRect().left + window.scrollX;
+imgBox.addEventListener("mousemove", function(e){
+    let x = e.pageX - leftSpace;
 
-function check()
-{
-    let user = document.getElementById("res").value;
+    if(x < 0) x = 0;
+    if(x > imgBox.offsetWidth) x = imgBox.offsetWidth;
 
-    if(user == Captcha)
-    {
-        document.getElementById("result").innerText="Correct ✅";
-    }
-    else{
-        document.getElementById("result").innerText="Incorrect ❌";
-    }
-}
+    imgWrap.style.width = x + "px";
+    line.style.left = x + "px";
+});
+imgBox.addEventListener("touchmove", function(e){
+    let touch = e.touches[0];
+    let x = touch.pageX - leftSpace;
+
+    if(x < 0) x = 0;
+    if(x > imgBox.offsetWidth) x = imgBox.offsetWidth;
+
+    imgWrap.style.width = x + "px";
+    line.style.left = x + "px";
+});
 </script>
 
 </body>
